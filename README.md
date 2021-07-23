@@ -1,4 +1,5 @@
-Cidades Estados do Brasil em JSON
-====================
+# Cidades Estados do Brasil em JSON
 
 Array de estados (com acentos) e cidades(com acentos) do Brasil em JSON com ID relacionado.
+
+Comando para executar: "node index.js"

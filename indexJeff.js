@@ -1,14 +1,15 @@
+import { debug } from 'console';
 import { promises as fs } from 'fs';
 // import * as cities from './Cidades.json';
 // import * as states from './Estados.json';
 
-order()
+// order()
+mostPopulousStatesReborn()
 
 async function order() {
    // citiesOfState('ro'); // 2. Mostra a quantidade de municípios do estado do parâmetro.
    // await organizeStates(); // 1. Cria um arquivo para cada estado com suas respectivas cidades
-   // mostPopulousStates();
-   lessPopulousSates();
+   mostPopulousStates();
 }
 
 async function organizeStates() {
@@ -48,66 +49,67 @@ async function citiesOfState(uf) {
    }
 }
 
+/**Criar um método que imprima no console um array com o UF dos cinco estados
+que mais possuem cidades, seguidos da quantidade, em ordem decrescente. Você
+pode usar a função criada no tópico 2. Exemplo de impressão: 
+[“UF - 93”, “UF - 82”, “UF - 74”, “UF - 72”, “UF - 65”]
+ */
 async function mostPopulousStates() {
    try {
       const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
-      let statesWithAmountOfCities = []; //Armazena os estados e suas quantidades de cidades.
-      let biggestStatesByNumberOfCities = []; //Armazena os estados com mais cidades
+      const statesByCities = {}; //Armazena os estados e suas quantidades de cidades
+      // console.log(statesOfBrazil);
 
       for (let i = 0; i < statesOfBrazil.length; i++) { //Conta as cidades do estado.
-         const uf = statesOfBrazil[i].Sigla; //Coloca UF na variável para melhor leitura posteriormente
-         const citiesOfState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
+         const UF = statesOfBrazil[i].Sigla; //Coloca UF na variável para melhor leitura posteriormente
+         const citiesOfState = JSON.parse(await fs.readFile('./states/' + UF + '.json'));
          const countCities = citiesOfState.length; //Conta as cidades
-         statesWithAmountOfCities.push({ uf, amountOfCities: countCities });
+         statesByCities[UF] = countCities;
       }
+      console.log(statesByCities);
 
-      statesWithAmountOfCities.sort((a, b) => {
-         return b.amountOfCities - a.amountOfCities;
-      });
-
-      statesWithAmountOfCities = statesWithAmountOfCities.slice(0, 5); //Cortando array deixando somente os 5 primeiros.
-
-      statesWithAmountOfCities.forEach(state => { //Adicionando-os no array
-         biggestStatesByNumberOfCities.push(`${state.uf} - ${state.amountOfCities}`);
-      })
-      console.log(biggestStatesByNumberOfCities);
-
+      /**Até o momento estamos contando e mostrando a quantidade de cidades dos estados */
    } catch (error) {
       console.log(error);
    }
 }
 
-async function lessPopulousSates() {
+async function mostPopulousStatesReborn() {
    try {
       const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
-      let statesWithAmountOfCities = []; //Armazena os estados e suas quantidades de cidades.
-      let smallestStatesByNumberOfCities = []; //Armazena os estados com menos cidades
+      // Acredito q variaveis mais descritiveis são melhores
+      // de nada adianta ser curta se quando vc lê fica se perguntando pra q serve
+      let statesWithAmountOfCities = []
 
-      for (let i = 0; i < statesOfBrazil.length; i++) { //Conta as cidades do estado.
-         const uf = statesOfBrazil[i].Sigla; //Coloca UF na variável para melhor leitura posteriormente
-         const citiesOfState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
-         const countCities = citiesOfState.length; //Conta as cidades
-         statesWithAmountOfCities.push({ uf, amountOfCities: countCities });
+      for (let i = 0; i < statesOfBrazil.length; i++) {
+         const uf = statesOfBrazil[i].Sigla
+         // Aqui eu só quebrei pra ficar um pouco mais legível
+         const buffer = await fs.readFile(`./states/${uf}.json`)
+         const cities = JSON.parse(buffer)
+
+         // O push q antes estava errado, agora eu adiciono um objeto
+         statesWithAmountOfCities.push({
+            uf,
+            amountOfCities: cities.length,
+         })
       }
 
-      //Ordena crescente para tirar os menores.
-      statesWithAmountOfCities.sort((a, b) => {
-         return a.amountOfCities - b.amountOfCities;
-      });
+      // Primeiro ordem decrescente
+      statesWithAmountOfCities = statesWithAmountOfCities.sort((a, b) => {
+         if (a.amountOfCities > b.amountOfCities) {
+            return -1
+         }
+         if (a.amountOfCities < b.amountOfCities) {
+            return 1
+         }
 
-      //Cortando array deixando somente os 5 primeiros.
-      statesWithAmountOfCities = statesWithAmountOfCities.slice(0, 5);
-
-      //Ordena decrescente para mostrar.
-      statesWithAmountOfCities.sort((a, b) => {
-         return b.amountOfCities - a.amountOfCities;
-      });
-
-      statesWithAmountOfCities.forEach(state => { //Adicionando-os no array
-         smallestStatesByNumberOfCities.push(`${state.uf} - ${state.amountOfCities}`);
+         return 0
       })
-      console.log(smallestStatesByNumberOfCities);
+      // Depois cortamos o array e pegamos só os 5 primeiros
+      statesWithAmountOfCities = statesWithAmountOfCities.slice(0, 5)
 
+      // Agora é só formatar como é pedido
+      console.debug(statesWithAmountOfCities)
    } catch (error) {
       console.log(error);
    }

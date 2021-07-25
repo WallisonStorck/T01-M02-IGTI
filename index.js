@@ -8,7 +8,8 @@ async function order() {
    // citiesOfState('ro'); // 2. Mostra a quantidade de municípios do estado do parâmetro.
    // await organizeStates(); // 1. Cria um arquivo para cada estado com suas respectivas cidades
    // mostPopulousStates();
-   lessPopulousSates();
+   // lessPopulousSates();
+   citiesWithBiggestName()
 }
 
 async function organizeStates() {
@@ -107,6 +108,43 @@ async function lessPopulousSates() {
          smallestStatesByNumberOfCities.push(`${state.uf} - ${state.amountOfCities}`);
       })
       console.log(smallestStatesByNumberOfCities);
+
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+/**Criar um método que imprima no console um array com a cidade de maior nome 
+* de cada estado, seguida de seu UF. Por exemplo: [“Nome da Cidade – UF”, 
+* “Nome da Cidade – UF”, ...]. */
+async function citiesWithBiggestName() {
+   try {
+      const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
+      const cityWithBiggestNameOfStates = []; //Guardar a cidade de maior nome de cada estado
+
+      for (let i = 0; i < statesOfBrazil.length; i++) {
+         const uf = statesOfBrazil[i].Sigla; //Guarda a sigla do estado
+         const citiesInThisState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
+
+         //Cria um novo array somente com os nomes das cidades
+         const onlyName = citiesInThisState.map((city) => {
+            return {
+               Nome: `${city.Nome} - ${uf}`
+            }
+         });
+
+         //Ordena para obter cidade de maior nome
+         onlyName.sort((a, b) => {
+            return b.Nome.length - a.Nome.length;
+         });
+
+         //Corta na posição 0, 1 valor, ou seja, corta e deixa somente a de maior nome
+         const cityWithBiggestName = onlyName.slice(0, 1);
+
+         //Insere no array geral que recebe a cidade de cada estado.
+         cityWithBiggestNameOfStates.push(cityWithBiggestName);
+      }
+      console.log(cityWithBiggestNameOfStates);
 
    } catch (error) {
       console.log(error);

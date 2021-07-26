@@ -5,12 +5,14 @@ import { promises as fs } from 'fs';
 order()
 
 async function order() {
-   // citiesOfState('ro'); // 2. Mostra a quantidade de municípios do estado do parâmetro.
    // await organizeStates(); // 1. Cria um arquivo para cada estado com suas respectivas cidades
-   // mostPopulousStates();
-   // lessPopulousSates();
-   // citiesWithBiggestName();
-   citiesWithLesserName()
+   // citiesOfState('ro'); // 2. Mostra a quantidade de municípios do estado do parâmetro.
+   // mostPopulousStates(); // 3. Estados com mais cidades no Brasil.
+   // lessPopulousSates(); // 4. Estados com menos cidades no Brasil.
+   // citiesWithBiggestName(); // 5. Cidade com maior nome de cada estado.
+   // citiesWithLesserName(); // 6. Cidade com menor nome de cada estado.
+   // biggestCityNameInBrazil(); // 7. Cidade de maior nome entre todos os estados.
+   lesserCityNameInBrazil(); // 8. Cidade de menor nome entre todos os estados.
 }
 
 async function organizeStates() {
@@ -72,6 +74,7 @@ async function mostPopulousStates() {
       statesWithAmountOfCities.forEach(state => { //Adicionando-os no array
          biggestStatesByNumberOfCities.push(`${state.uf} - ${state.amountOfCities}`);
       })
+      console.log('Os estados com maiores números de cidades são: ');
       console.log(biggestStatesByNumberOfCities);
 
    } catch (error) {
@@ -108,6 +111,7 @@ async function lessPopulousSates() {
       statesWithAmountOfCities.forEach(state => { //Adicionando-os no array
          smallestStatesByNumberOfCities.push(`${state.uf} - ${state.amountOfCities}`);
       })
+      console.log('Os estados com maiores números de cidades são: ');
       console.log(smallestStatesByNumberOfCities);
 
    } catch (error) {
@@ -142,6 +146,7 @@ async function citiesWithBiggestNameOLD() {
          //Insere no array geral que recebe a cidade de cada estado.
          cityWithBiggestNameOfStates.push(cityWithBiggestName);
       }
+      console.log('A cidade de maior nome de cada estado: ');
       console.log(cityWithBiggestNameOfStates);
 
    } catch (error) {
@@ -176,6 +181,7 @@ async function citiesWithBiggestName() {
          //Insere no array geral que recebe a cidade de cada estado.
          cityWithBiggestNameOfStates.push(biggestCurrentName);
       }
+      console.log('A cidade de maior nome de cada estado: ');
       console.log(cityWithBiggestNameOfStates);
 
    } catch (error) {
@@ -210,7 +216,71 @@ async function citiesWithLesserName() {
          //Insere no array geral que recebe a cidade de cada estado.
          cityWithLesserNameOfStates.push(lesserCurrentName);
       }
+      console.log('A cidade de menor nome de cada estado: ');
       console.log(cityWithLesserNameOfStates);
+
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+async function biggestCityNameInBrazil() {
+   try {
+      const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
+      let biggestCityNameInBrazil = ''; //Guardar a cidade de menor nome de cada estado
+
+      for (let i = 0; i < statesOfBrazil.length; i++) {
+         const uf = statesOfBrazil[i].Sigla; //Guarda a sigla do estado
+         const citiesInThisState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
+
+         //Cria um novo array somente com os nomes das cidades
+         const onlyName = citiesInThisState.map((city) => {
+            return {
+               Nome: `${city.Nome} - ${uf}`
+            }
+         });
+
+         //Compara o tamanho dos nomes das cidades de deixa guardado em "biggestCityNameInBrazil";
+         onlyName.forEach(city => {
+            if (biggestCityNameInBrazil.length == 0 || biggestCityNameInBrazil.length < city.Nome.length) {
+               biggestCityNameInBrazil = city.Nome;
+            }
+         });
+
+      }
+      console.log('A cidade de maior nome no Brasil é: ' + biggestCityNameInBrazil);
+
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+async function lesserCityNameInBrazil() {
+   try {
+      const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
+      let lesserCityNameInBrazil = ''; //Guardar a cidade de menor nome de cada estado
+
+      for (let i = 0; i < statesOfBrazil.length; i++) {
+         const uf = statesOfBrazil[i].Sigla; //Guarda a sigla do estado
+         const citiesInThisState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
+
+         //Cria um novo array somente com os nomes das cidades
+         const onlyName = citiesInThisState.map((city) => {
+            return {
+               Nome: `${city.Nome} - ${uf}`
+            }
+         });
+
+         onlyName.forEach(city => {
+            if (lesserCityNameInBrazil.length == 0 || lesserCityNameInBrazil.length > city.Nome.length) {
+               lesserCityNameInBrazil = city.Nome;
+               console.log('Conteudo em "lesserCityNameInBrazil":' + lesserCityNameInBrazil);
+               console.log('Conteudo em "city.Nome":' + city.Nome);
+            }
+         });
+
+      }
+      console.log('A cidade de menor nome no Brasil é: ' + lesserCityNameInBrazil);
 
    } catch (error) {
       console.log(error);

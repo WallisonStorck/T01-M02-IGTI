@@ -9,7 +9,8 @@ async function order() {
    // await organizeStates(); // 1. Cria um arquivo para cada estado com suas respectivas cidades
    // mostPopulousStates();
    // lessPopulousSates();
-   citiesWithBiggestName()
+   // citiesWithBiggestName();
+   citiesWithLesserName()
 }
 
 async function organizeStates() {
@@ -114,10 +115,7 @@ async function lessPopulousSates() {
    }
 }
 
-/**Criar um método que imprima no console um array com a cidade de maior nome 
-* de cada estado, seguida de seu UF. Por exemplo: [“Nome da Cidade – UF”, 
-* “Nome da Cidade – UF”, ...]. */
-async function citiesWithBiggestName() {
+async function citiesWithBiggestNameOLD() {
    try {
       const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
       const cityWithBiggestNameOfStates = []; //Guardar a cidade de maior nome de cada estado
@@ -145,6 +143,74 @@ async function citiesWithBiggestName() {
          cityWithBiggestNameOfStates.push(cityWithBiggestName);
       }
       console.log(cityWithBiggestNameOfStates);
+
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+async function citiesWithBiggestName() {
+   try {
+      const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
+      const cityWithBiggestNameOfStates = []; //Guardar a cidade de maior nome de cada estado
+
+      for (let i = 0; i < statesOfBrazil.length; i++) {
+         const uf = statesOfBrazil[i].Sigla; //Guarda a sigla do estado
+         const citiesInThisState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
+         let biggestCurrentName = ''; //Usada para comparar os tamanhos de nomes.
+
+         //Cria um novo array somente com os nomes das cidades
+         const onlyName = citiesInThisState.map((city) => {
+            return {
+               Nome: `${city.Nome} - ${uf}`
+            }
+         });
+
+         //Compara o tamanho dos nomes das cidades de deixa guardado em "biggestCurrentName";
+         onlyName.forEach(city => {
+            if (biggestCurrentName.length < city.Nome.length) {
+               biggestCurrentName = city.Nome;
+            }
+         });
+
+         //Insere no array geral que recebe a cidade de cada estado.
+         cityWithBiggestNameOfStates.push(biggestCurrentName);
+      }
+      console.log(cityWithBiggestNameOfStates);
+
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+async function citiesWithLesserName() {
+   try {
+      const statesOfBrazil = JSON.parse(await fs.readFile('Estados.json'));
+      const cityWithLesserNameOfStates = []; //Guardar a cidade de menor nome de cada estado
+
+      for (let i = 0; i < statesOfBrazil.length; i++) {
+         const uf = statesOfBrazil[i].Sigla; //Guarda a sigla do estado
+         const citiesInThisState = JSON.parse(await fs.readFile(`./states/${uf}.json`));
+         let lesserCurrentName = ''; //Usada para comparar os tamanhos de nomes.
+
+         //Cria um novo array somente com os nomes das cidades
+         const onlyName = citiesInThisState.map((city) => {
+            return {
+               Nome: `${city.Nome} - ${uf}`
+            }
+         });
+
+         //Compara o tamanho dos nomes das cidades de deixa guardado em "lesserCurrentName";
+         onlyName.forEach(city => {
+            if (lesserCurrentName.length == 0 || lesserCurrentName.length > city.Nome.length) {
+               lesserCurrentName = city.Nome;
+            }
+         });
+
+         //Insere no array geral que recebe a cidade de cada estado.
+         cityWithLesserNameOfStates.push(lesserCurrentName);
+      }
+      console.log(cityWithLesserNameOfStates);
 
    } catch (error) {
       console.log(error);
